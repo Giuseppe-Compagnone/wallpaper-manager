@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.wallpaper-manager"
+          path="/org/gnome/shell/extensions/wallpaper-manager/">
+    <key name="wallpaper-folder" type="s">
+      <default>''</default>
+      <summary>Wallpaper folder</summary>
+      <description>Folder containing the images assigned to monitors and workspaces.</description>
+    </key>
+    <key name="fit-mode" type="s">
+      <choices>
+        <choice value="zoom"/>
+        <choice value="fit"/>
+      </choices>
+      <default>'zoom'</default>
+      <summary>Wallpaper scaling mode</summary>
+    </key>
+    <key name="shuffle" type="b">
+      <default>false</default>
+      <summary>Shuffle images</summary>
+    </key>
+    <key name="shuffle-seed" type="u">
+      <default>1</default>
+      <summary>Stable random order seed</summary>
+    </key>
+  </schema>
+</schemalist>
