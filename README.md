@@ -105,6 +105,7 @@ Required build tools:
 - `glib-compile-schemas`
 - Node.js 18 or newer, used only for tests
 - GNU Make
+- Python Babel, only when rebuilding translation catalogs
 
 Build and install the extension:
 
@@ -115,6 +116,9 @@ make install
 
 The install target creates the extension ZIP and installs it for the current
 user. Log out and back in on Wayland before enabling it.
+
+To rebuild `.mo` files after editing a `.po` file, install the Python Babel
+package provided by your distribution and run `make translations`.
 
 ## Configuration
 

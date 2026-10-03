@@ -38,6 +38,9 @@ catalogs with:
 make translations
 ```
 
+This helper requires the Python Babel package (usually packaged as
+`python3-babel`).
+
 The generated files under `extension/locale/` are part of the distributable
 extension and must be included in release commits. The English source strings
 remain the fallback when a locale is incomplete.
