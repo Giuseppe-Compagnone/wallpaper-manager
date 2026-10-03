@@ -13,6 +13,26 @@ env:
   ZIP: outputs/wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
 
 jobs:
+  credentials:
+    name: Check marketplace credentials
+    runs-on: ubuntu-24.04
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+
+    steps:
+      - id: check
+        name: Check GNOME Extensions secrets
+        env:
+          GNOME_EXTENSIONS_USERNAME: ${{ secrets.GNOME_EXTENSIONS_USERNAME }}
+          GNOME_EXTENSIONS_PASSWORD: ${{ secrets.GNOME_EXTENSIONS_PASSWORD }}
+        run: |
+          if [[ -n "$GNOME_EXTENSIONS_USERNAME" && -n "$GNOME_EXTENSIONS_PASSWORD" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Marketplace upload skipped: configure GNOME_EXTENSIONS_USERNAME and GNOME_EXTENSIONS_PASSWORD."
+          fi
+
   build:
     name: Test, package, and release
     runs-on: ubuntu-24.04
@@ -58,8 +78,66 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "build-${GITHUB_RUN_NUMBER}" "$ZIP" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "Wallpaper Manager build ${GITHUB_RUN_NUMBER}" \
-            --notes "Automated build for commit ${GITHUB_SHA}."
+          tag="build-${GITHUB_RUN_NUMBER}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "$ZIP" \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          else
+            gh release create "$tag" "$ZIP" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Wallpaper Manager build ${GITHUB_RUN_NUMBER}" \
+              --notes "Automated build for commit ${GITHUB_SHA}."
+          fi
+
+  publish-marketplace:
+    name: Publish to extensions.gnome.org
+    needs:
+      - build
+      - credentials
+    if: ${{ needs.credentials.outputs.configured == 'true' }}
+    runs-on: ubuntu-24.04
+    env:
+      GNOME_EXTENSIONS_USERNAME: ${{ secrets.GNOME_EXTENSIONS_USERNAME }}
+      GNOME_EXTENSIONS_PASSWORD: ${{ secrets.GNOME_EXTENSIONS_PASSWORD }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Stamp the marketplace version
+        env:
+          RELEASE_VERSION: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("extension/metadata.json")
+          metadata = json.loads(path.read_text(encoding="utf-8"))
+          metadata["version"] = int(os.environ["RELEASE_VERSION"])
+          path.write_text(
+              json.dumps(metadata, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload the extension to GNOME Extensions
+        uses: murar8/gnome-extensions-action@0.1.1
+        with:
+          source-dir: ./extension
+          output-dir: ./outputs
+          force: true
+          username: ${{ env.GNOME_EXTENSIONS_USERNAME }}
+          password: ${{ env.GNOME_EXTENSIONS_PASSWORD }}
+          accept-tos: true
+          extra-source: |
+            ./assignment.js
+            ./fileScanner.js
+            ./shellBackgrounds.js
+            ./wallpaperController.js
+            ./wallpaper-manager.png
+            ./COPYING
+            ./locale

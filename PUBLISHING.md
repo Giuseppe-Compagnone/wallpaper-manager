@@ -37,7 +37,14 @@ manual dispatch. It runs `make pack`, uploads the ZIP as a workflow artifact,
 and attaches the same ZIP to a numbered GitHub release. The CI-only version is
 the GitHub Actions run number; the committed `metadata.json` is not changed.
 
-Marketplace publication is intentionally not enabled by this build-only
-workflow. An automated upload needs an extensions.gnome.org account credential
-and acceptance of the marketplace agreement. Add that step only after
-explicitly approving how those credentials are passed to the uploader.
+The workflow also publishes to extensions.gnome.org when these repository
+secrets are configured:
+
+- `GNOME_EXTENSIONS_USERNAME`;
+- `GNOME_EXTENSIONS_PASSWORD`.
+
+If either secret is missing, the marketplace job is skipped and the build and
+GitHub release still succeed. The upload uses the community
+`murar8/gnome-extensions-action` and accepts the GNOME Extensions Developer
+Agreement for the configured account. Review that action and accept the
+agreement for the account before enabling the secrets.

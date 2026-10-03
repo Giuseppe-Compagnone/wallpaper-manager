@@ -207,11 +207,11 @@ as a GitHub Actions artifact, and attaches the same ZIP to a numbered GitHub
 release. The release version is stamped from the Actions run number, without
 modifying the committed source metadata.
 
-Marketplace publication is kept as a separate step because it requires
-transferring an extensions.gnome.org account credential to an upload service
-and accepting the marketplace agreement. Configure that step only after
-reviewing and approving the credential-handling procedure in
-`PUBLISHING.md`.
+The workflow also publishes to extensions.gnome.org when the repository has
+both `GNOME_EXTENSIONS_USERNAME` and `GNOME_EXTENSIONS_PASSWORD` Actions
+secrets. If either secret is missing, the marketplace job is skipped while the
+build and GitHub release still succeed. The upload accepts the GNOME Extensions
+Developer Agreement on behalf of the configured account.
 
 Inspect its contents before distributing it:
 
