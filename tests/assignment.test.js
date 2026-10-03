@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+    ensureDifferentSelection,
     imageForSlot,
     imagesForWorkspace,
     orderImages,
@@ -28,6 +29,15 @@ test('il rimescolamento è stabile per lo stesso seme', () => {
     const paths = ['d', 'a', 'c', 'b'];
     assert.deepEqual(orderImages(paths, true, 42), orderImages(paths, true, 42));
     assert.notDeepEqual(orderImages(paths, true, 42), orderImages(paths, true, 43));
+});
+
+test('il rimescolamento cambia il gruppo visibile quando avanzano immagini', () => {
+    const current = ['a', 'c', 'd', 'e', 'b'];
+    const previous = ['a', 'c', 'd', 'e'];
+    const next = ensureDifferentSelection(current, previous, 4);
+
+    assert.deepEqual(next.slice(0, 4), ['c', 'd', 'e', 'b']);
+    assert.equal(next.includes('b'), true);
 });
 
 test('l’ordine normale è alfabetico', () => {

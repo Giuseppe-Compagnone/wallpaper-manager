@@ -6,7 +6,11 @@ import GLib from 'gi://GLib';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import {imageForSlot, orderImages} from './assignment.js';
+import {
+    ensureDifferentSelection,
+    imageForSlot,
+    orderImages,
+} from './assignment.js';
 import {listImageFiles} from './fileScanner.js';
 import {ShellBackgrounds} from './shellBackgrounds.js';
 
@@ -21,6 +25,8 @@ export class WallpaperController {
         this._scanGeneration = 0;
         this._reloadSourceId = 0;
         this._warnedEmpty = false;
+        this._previousVisiblePaths = [];
+        this._appliedShuffleSeed = null;
     }
 
     enable() {
@@ -72,6 +78,8 @@ export class WallpaperController {
 
         this._desktopBackgrounds.clear();
         this._paths = [];
+        this._previousVisiblePaths = [];
+        this._appliedShuffleSeed = null;
         this._settings = null;
     }
 
@@ -100,6 +108,8 @@ export class WallpaperController {
         const folder = this._settings.get_string('wallpaper-folder');
         if (!folder) {
             this._paths = [];
+            this._previousVisiblePaths = [];
+            this._appliedShuffleSeed = null;
             this._refreshBackgrounds();
             return;
         }
@@ -109,11 +119,28 @@ export class WallpaperController {
                 if (!this._settings || generation !== this._scanGeneration)
                     return;
 
-                this._paths = orderImages(
+                const shuffle = this._settings.get_boolean('shuffle');
+                const shuffleSeed = this._settings.get_uint('shuffle-seed');
+                let ordered = orderImages(
                     paths,
-                    this._settings.get_boolean('shuffle'),
-                    this._settings.get_uint('shuffle-seed')
+                    shuffle,
+                    shuffleSeed
                 );
+                const reshuffled = shuffle &&
+                    this._appliedShuffleSeed !== null &&
+                    shuffleSeed !== this._appliedShuffleSeed;
+                if (reshuffled)
+                    ordered = ensureDifferentSelection(
+                        ordered,
+                        this._previousVisiblePaths,
+                        this._visibleSlotCount()
+                    );
+
+                this._paths = ordered;
+                this._previousVisiblePaths = ordered.slice(
+                    0, this._visibleSlotCount()
+                );
+                this._appliedShuffleSeed = shuffle ? shuffleSeed : null;
                 this._warnedEmpty = false;
                 if (this._paths.length === 0)
                     this._notifyEmptyFolder();
@@ -216,6 +243,12 @@ export class WallpaperController {
             ? GDesktopEnums.BackgroundStyle.SCALED
             : GDesktopEnums.BackgroundStyle.ZOOM;
         return {path, style};
+    }
+
+    _visibleSlotCount() {
+        const monitorCount = Main.layoutManager.monitors.length;
+        const workspaceCount = global.workspace_manager.n_workspaces;
+        return monitorCount * workspaceCount;
     }
 
     _notifyEmptyFolder() {

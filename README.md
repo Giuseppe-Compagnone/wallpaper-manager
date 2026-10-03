@@ -81,7 +81,10 @@ For example, with two monitors and five images:
 | 3 | Image E | Image A |
 
 The shuffled order is deterministic for a given seed. Pressing **Reshuffle**
-increments the seed and creates a new stable assignment.
+increments the seed, samples a new visible group from the folder, and creates
+a new stable assignment. When the folder contains more images than slots, the
+next shuffle is guaranteed to change the visible group instead of repeatedly
+leaving the same image unused.
 
 ## Installation
 
