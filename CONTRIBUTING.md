@@ -28,6 +28,20 @@ them. A minimal test image or a description of its dimensions is sufficient.
 7. Run `make check` and `make pack`.
 8. Test the generated ZIP in a fresh GNOME Shell session.
 
+## Translations
+
+User-visible strings are marked with gettext in `extension/prefs.js` and the
+controller. Add or update translations in `po/<locale>.po`, then compile the
+catalogs with:
+
+```bash
+make translations
+```
+
+The generated files under `extension/locale/` are part of the distributable
+extension and must be included in release commits. The English source strings
+remain the fallback when a locale is incomplete.
+
 ## Code style
 
 - Use four spaces and no tab indentation in JavaScript.

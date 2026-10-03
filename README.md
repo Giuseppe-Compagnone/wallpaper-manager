@@ -26,6 +26,7 @@ connect to remote services, collect analytics, or share user data.
 - Images repeat only after every available image has been assigned.
 - No network access, telemetry, subprocesses, or bundled artwork.
 - Native GNOME preferences built with GTK 4 and Libadwaita.
+- Preferences and notifications translated according to the system language.
 
 ## Compatibility
 
@@ -133,6 +134,16 @@ Changes are applied automatically. The folder is monitored while the extension
 is active, so adding or removing an image does not require restarting GNOME
 Shell.
 
+## Localization
+
+Wallpaper Manager follows the language configured for the GNOME session. No
+language selector is needed: gettext automatically selects the closest
+available catalog and falls back to English when a translation is unavailable.
+
+The release currently includes Italian, German, French, Spanish, Brazilian
+Portuguese, Russian, Simplified Chinese, and Japanese catalogs. English is the
+source-language fallback.
+
 ## Architecture
 
 The extension deliberately avoids generating large composite images. Each
@@ -149,6 +160,8 @@ workspace.
 | `extension/prefs.js` | GTK 4/Libadwaita preferences window. |
 | `extension/wallpaper-manager.png` | Preferences and marketplace icon. |
 | `extension/schemas/` | GSettings schema. |
+| `extension/locale/` | Compiled gettext catalogs loaded by GNOME. |
+| `po/` | Source translations and the gettext template. |
 
 Folder enumeration is asynchronous to avoid blocking GNOME Shell. Method
 overrides are managed with GNOME's `InjectionManager` and are fully restored
@@ -219,6 +232,8 @@ Test at least these scenarios before a release:
 ```text
 wallpaper-manager/
 ├── extension/          Runtime extension and GSettings schema
+├── po/                 Gettext source catalogs
+├── tools/              Translation build helper
 ├── tests/              Pure JavaScript tests
 ├── Makefile            Check, package, and install targets
 ├── MARKETPLACE.md      Suggested GNOME Extensions listing text

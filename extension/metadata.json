@@ -3,6 +3,7 @@
   "name": "Wallpaper Manager",
   "description": "Assign a different wallpaper to every monitor and workspace. Images are only repeated after the entire folder has been used.",
   "settings-schema": "org.gnome.shell.extensions.wallpaper-manager",
+  "gettext-domain": "wallpaper-manager",
   "shell-version": ["46"],
   "url": "https://github.com/Giuseppe-Compagnone/wallpaper-manager"
 }

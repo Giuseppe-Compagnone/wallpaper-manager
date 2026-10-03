@@ -7,6 +7,7 @@ import Gtk from 'gi://Gtk';
 
 import {
     ExtensionPreferences,
+    gettext as _,
 } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class WallpaperManagerPreferences extends ExtensionPreferences {
@@ -21,25 +22,27 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
             iconTheme.add_search_path(iconPath);
 
         const page = new Adw.PreferencesPage({
-            title: 'Wallpaper Manager',
+            title: _('Wallpaper Manager'),
             icon_name: 'wallpaper-manager',
         });
         const sourceGroup = new Adw.PreferencesGroup({
-            title: 'Wallpapers',
-            description: 'Every image is used once before the list repeats.',
+            title: _('Wallpapers'),
+            description: _(
+                'Every image is used once before the list repeats.'
+            ),
         });
 
         const folderRow = new Adw.ActionRow({
-            title: 'Image folder',
+            title: _('Image folder'),
             subtitle: this._folderLabel(settings),
         });
         const folderButton = new Gtk.Button({
-            label: 'Choose…',
+            label: _('Choose…'),
             valign: Gtk.Align.CENTER,
         });
         folderButton.connect('clicked', () => {
             const dialog = new Gtk.FileDialog({
-                title: 'Choose a wallpaper folder',
+                title: _('Choose a wallpaper folder'),
                 modal: true,
             });
             dialog.select_folder(window, null, (source, result) => {
@@ -53,7 +56,7 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
                         Gtk.DialogError,
                         Gtk.DialogError.DISMISSED
                     ))
-                        console.error(`Wallpaper Manager: ${error.message}`);
+                        console.error(`${_('Wallpaper Manager')}: ${error.message}`);
                 }
             });
         });
@@ -65,8 +68,10 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         }));
 
         const shuffleRow = new Adw.SwitchRow({
-            title: 'Shuffle images',
-            subtitle: 'The random order stays stable until you reshuffle it.',
+            title: _('Shuffle images'),
+            subtitle: _(
+                'The random order stays stable until you reshuffle it.'
+            ),
         });
         settings.bind(
             'shuffle',
@@ -77,11 +82,13 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         sourceGroup.add(shuffleRow);
 
         const reshuffleRow = new Adw.ActionRow({
-            title: 'Reshuffle now',
-            subtitle: 'Create a new assignment for monitors and workspaces.',
+            title: _('Reshuffle now'),
+            subtitle: _(
+                'Create a new assignment for monitors and workspaces.'
+            ),
         });
         const reshuffleButton = new Gtk.Button({
-            label: 'Reshuffle',
+            label: _('Reshuffle'),
             valign: Gtk.Align.CENTER,
             sensitive: settings.get_boolean('shuffle'),
         });
@@ -99,13 +106,13 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         sourceGroup.add(reshuffleRow);
 
         const appearanceGroup = new Adw.PreferencesGroup({
-            title: 'Appearance',
+            title: _('Appearance'),
         });
         const fitRow = new Adw.ComboRow({
-            title: 'Wallpaper scaling',
+            title: _('Wallpaper scaling'),
             model: Gtk.StringList.new([
-                'Fill and crop',
-                'Fit with borders',
+                _('Fill and crop'),
+                _('Fit with borders'),
             ]),
             selected: settings.get_string('fit-mode') === 'fit' ? 1 : 0,
         });
@@ -118,9 +125,11 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         appearanceGroup.add(fitRow);
 
         const infoGroup = new Adw.PreferencesGroup({
-            title: 'Assignment order',
-            description: 'Workspace 1 · monitor 1, workspace 1 · monitor 2, '
-                + 'then workspace 2, and so on.',
+            title: _('Assignment order'),
+            description: _(
+                'Workspace 1 · monitor 1, workspace 1 · monitor 2, '
+                + 'then workspace 2, and so on.'
+            ),
         });
 
         page.add(sourceGroup);
@@ -137,6 +146,6 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
     }
 
     _folderLabel(settings) {
-        return settings.get_string('wallpaper-folder') || 'No folder selected';
+        return settings.get_string('wallpaper-folder') || _('No folder selected');
     }
 }

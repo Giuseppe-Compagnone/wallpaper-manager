@@ -9,7 +9,10 @@ import {WallpaperController} from './wallpaperController.js';
 
 export default class WallpaperManagerExtension extends Extension {
     enable() {
-        this._controller = new WallpaperController(this.getSettings());
+        this._controller = new WallpaperController(
+            this.getSettings(),
+            text => this.gettext(text)
+        );
         this._controller.enable();
     }
 

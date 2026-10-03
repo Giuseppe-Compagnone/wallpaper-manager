@@ -13,8 +13,9 @@ import {ShellBackgrounds} from './shellBackgrounds.js';
 const RELOAD_DELAY_MS = 250;
 
 export class WallpaperController {
-    constructor(settings) {
+    constructor(settings, gettext = text => text) {
         this._settings = settings;
+        this._gettext = gettext;
         this._paths = [];
         this._desktopBackgrounds = new Map();
         this._scanGeneration = 0;
@@ -129,8 +130,10 @@ export class WallpaperController {
                     `Wallpaper Manager: ${error.message}\n${error.stack ?? ''}`
                 );
                 Main.notify(
-                    'Wallpaper Manager',
-                    'The selected wallpaper folder could not be read.'
+                    this._gettext('Wallpaper Manager'),
+                    this._gettext(
+                        'The selected wallpaper folder could not be read.'
+                    )
                 );
             });
     }
@@ -221,8 +224,10 @@ export class WallpaperController {
 
         this._warnedEmpty = true;
         Main.notify(
-            'Wallpaper Manager',
-            'No supported images were found in the selected folder.'
+            this._gettext('Wallpaper Manager'),
+            this._gettext(
+                'No supported images were found in the selected folder.'
+            )
         );
     }
 }

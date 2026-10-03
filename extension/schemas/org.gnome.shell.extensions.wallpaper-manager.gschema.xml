@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist>
+<schemalist gettext-domain="wallpaper-manager">
   <schema id="org.gnome.shell.extensions.wallpaper-manager"
           path="/org/gnome/shell/extensions/wallpaper-manager/">
     <key name="wallpaper-folder" type="s">
