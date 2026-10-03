@@ -1,7 +1,7 @@
 # Wallpaper Manager
 
 <p align="center">
-  <img src="extension/icons/wallpaper-manager.png"
+  <img src="extension/wallpaper-manager.png"
        alt="Wallpaper Manager icon" width="192" height="192">
 </p>
 
@@ -147,7 +147,7 @@ workspace.
 | `extension/fileScanner.js` | Asynchronous folder enumeration and image filtering. |
 | `extension/assignment.js` | Pure ordering and slot-assignment functions. |
 | `extension/prefs.js` | GTK 4/Libadwaita preferences window. |
-| `extension/icons/` | Application and marketplace artwork. |
+| `extension/wallpaper-manager.png` | Preferences and marketplace icon. |
 | `extension/schemas/` | GSettings schema. |
 
 Folder enumeration is asynchronous to avoid blocking GNOME Shell. Method
@@ -233,7 +233,7 @@ must not be committed.
 ## Icon
 
 The canonical icon is
-[`extension/icons/wallpaper-manager.png`](extension/icons/wallpaper-manager.png).
+[`extension/wallpaper-manager.png`](extension/wallpaper-manager.png).
 It is an original 512 × 512 RGBA image with a transparent background. The
 preferences window loads it from the extension's private icon search path, and
 the same file can be uploaded as the extension icon on extensions.gnome.org.

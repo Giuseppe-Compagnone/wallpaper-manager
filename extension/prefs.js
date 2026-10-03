@@ -16,7 +16,7 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         const iconTheme = Gtk.IconTheme.get_for_display(
             Gdk.Display.get_default()
         );
-        const iconPath = this.dir.get_child('icons').get_path();
+        const iconPath = this.dir.get_path();
         if (!iconTheme.get_search_path().includes(iconPath))
             iconTheme.add_search_path(iconPath);
 

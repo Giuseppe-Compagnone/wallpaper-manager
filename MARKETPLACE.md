@@ -2,7 +2,7 @@
 
 ## Icon
 
-Use `extension/icons/wallpaper-manager.png`.
+Use `extension/wallpaper-manager.png`.
 
 ## Name
 

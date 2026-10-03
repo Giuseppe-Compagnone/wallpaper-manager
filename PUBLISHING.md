@@ -22,7 +22,7 @@ Before the first upload:
 4. Inspect the ZIP and confirm that it contains only runtime files, the schema
    and the license.
 5. Sign in to https://extensions.gnome.org, choose **Add yours**, upload the
-   ZIP from `outputs/`, and set `extension/icons/wallpaper-manager.png` as the
+   ZIP from `outputs/`, and set `extension/wallpaper-manager.png` as the
    extension icon.
 6. Provide screenshots without copyrighted artwork.
 

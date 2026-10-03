@@ -1,7 +1,7 @@
 UUID := wallpaper-manager@giuseppe-compagnone.github.io
 ZIP := outputs/$(UUID).shell-extension.zip
 SOURCES := assignment.js fileScanner.js shellBackgrounds.js wallpaperController.js \
-	icons/wallpaper-manager.png COPYING
+	wallpaper-manager.png COPYING
 
 .PHONY: check pack install clean
 
