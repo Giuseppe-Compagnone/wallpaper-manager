@@ -7,13 +7,20 @@
 export function orderImages(paths, shuffle = false, seed = 1) {
     const ordered = [...paths].sort((a, b) => a.localeCompare(b));
 
-    if (!shuffle)
+    if (!shuffle || ordered.length < 2)
         return ordered;
 
-    let state = seed >>> 0;
+    // Keep one shuffled base order for each complete image cycle. Rotating
+    // that order by one position per seed gives every image every slot once
+    // per cycle, while the base order changes between cycles.
+    const normalizedSeed = Math.max(1, seed >>> 0);
+    const cycle = Math.floor((normalizedSeed - 1) / ordered.length);
+    const rotation = (normalizedSeed - 1) % ordered.length;
+    let state = (cycle + 0x9e3779b9) >>> 0;
     const random = () => {
-        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-        return state / 0x100000000;
+        state = Math.imul(state ^ (state >>> 16), 0x21f0aaad);
+        state = Math.imul(state ^ (state >>> 15), 0x735a2d97);
+        return ((state ^ (state >>> 15)) >>> 0) / 0x100000000;
     };
 
     for (let i = ordered.length - 1; i > 0; i--) {
@@ -21,26 +28,10 @@ export function orderImages(paths, shuffle = false, seed = 1) {
         [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
     }
 
-    return ordered;
-}
-
-/**
- * Ensure a new shuffle exposes a different set of images when there are more
- * images than available monitor/workspace slots. Rotating the candidate order
- * is enough because all paths are unique and the first slotCount items are
- * the visible selection.
- */
-export function ensureDifferentSelection(paths, previousPaths, slotCount) {
-    if (paths.length <= slotCount || slotCount <= 0 || previousPaths.length === 0)
-        return paths;
-
-    const current = new Set(paths.slice(0, slotCount));
-    const previous = new Set(previousPaths.slice(0, slotCount));
-    if (current.size !== previous.size ||
-        [...current].some(path => !previous.has(path)))
-        return paths;
-
-    return [...paths.slice(1), paths[0]];
+    return [
+        ...ordered.slice(rotation),
+        ...ordered.slice(0, rotation),
+    ];
 }
 
 /**
