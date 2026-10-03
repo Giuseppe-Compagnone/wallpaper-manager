@@ -1,5 +1,9 @@
 # GNOME Extensions listing
 
+## Icon
+
+Use `extension/icons/wallpaper-manager.png`.
+
 ## Name
 
 Wallpaper Manager
@@ -24,6 +28,3 @@ Wallpaper Manager works entirely offline and does not collect data.
 1. Activities overview showing different wallpapers on adjacent workspaces.
 2. Two physical monitors using different wallpapers on the same workspace.
 3. The preferences window with a neutral, freely licensed wallpaper set.
-
-Do not use One Piece artwork or other copyrighted images in the public
-screenshots or extension bundle.

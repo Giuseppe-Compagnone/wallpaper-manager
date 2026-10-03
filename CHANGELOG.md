@@ -9,6 +9,7 @@ Extensions website assigns its own internal extension version numbers.
 
 ### Added
 
+- Original Wallpaper Manager icon for the preferences window and marketplace.
 - Per-monitor and per-workspace wallpaper assignment.
 - Correct backgrounds in the Activities overview and workspace animations.
 - Alphabetical and stable shuffled image ordering.

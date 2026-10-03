@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
@@ -12,10 +13,16 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         const signalIds = [];
+        const iconTheme = Gtk.IconTheme.get_for_display(
+            Gdk.Display.get_default()
+        );
+        const iconPath = this.dir.get_child('icons').get_path();
+        if (!iconTheme.get_search_path().includes(iconPath))
+            iconTheme.add_search_path(iconPath);
 
         const page = new Adw.PreferencesPage({
             title: 'Wallpaper Manager',
-            icon_name: 'preferences-desktop-wallpaper-symbolic',
+            icon_name: 'wallpaper-manager',
         });
         const sourceGroup = new Adw.PreferencesGroup({
             title: 'Wallpapers',
