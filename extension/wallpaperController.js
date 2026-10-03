@@ -72,9 +72,9 @@ export class WallpaperController {
         Main.layoutManager.disconnectObject(this);
         global.workspace_manager.disconnectObject(this);
 
+        this._restoreDesktopBackgrounds();
         this._shellBackgrounds?.disable();
         this._shellBackgrounds = null;
-        this._restoreDesktopBackgrounds();
 
         this._desktopBackgrounds.clear();
         this._paths = [];
@@ -224,8 +224,16 @@ export class WallpaperController {
     }
 
     _restoreDesktopBackgrounds() {
-        for (const manager of this._desktopBackgrounds.keys())
-            manager._updateBackgroundActor();
+        for (const manager of this._desktopBackgrounds.keys()) {
+            try {
+                manager._updateBackgroundActor();
+            } catch (error) {
+                console.debug(
+                    `Wallpaper Manager: could not restore a background: `
+                    + `${error.message}`
+                );
+            }
+        }
     }
 
     _wallpaperFor(workspaceIndex, monitorIndex) {
