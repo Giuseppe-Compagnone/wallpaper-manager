@@ -29,3 +29,15 @@ Before the first upload:
 The UUID is intentionally tied to the configured GitHub account:
 `wallpaper-manager@giuseppe-compagnone.github.io`. It must not be changed after
 the first public upload.
+
+## GitHub Actions builds
+
+`.github/workflows/build-release.yml` runs on every push to `main` and on
+manual dispatch. It runs `make pack`, uploads the ZIP as a workflow artifact,
+and attaches the same ZIP to a numbered GitHub release. The CI-only version is
+the GitHub Actions run number; the committed `metadata.json` is not changed.
+
+Marketplace publication is intentionally not enabled by this build-only
+workflow. An automated upload needs an extensions.gnome.org account credential
+and acceptance of the marketplace agreement. Add that step only after
+explicitly approving how those credentials are passed to the uploader.

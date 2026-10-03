@@ -1,0 +1,65 @@
+name: Build and release Wallpaper Manager
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  ZIP: outputs/wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
+
+jobs:
+  build:
+    name: Test, package, and release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install GNOME packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y gnome-shell
+
+      - name: Stamp the CI version
+        env:
+          RELEASE_VERSION: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("extension/metadata.json")
+          metadata = json.loads(path.read_text(encoding="utf-8"))
+          metadata["version"] = int(os.environ["RELEASE_VERSION"])
+          path.write_text(
+              json.dumps(metadata, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Run tests and build the extension
+        run: make pack
+
+      - name: Upload the ZIP as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallpaper-manager-${{ github.sha }}
+          path: ${{ env.ZIP }}
+          if-no-files-found: error
+
+      - name: Create a downloadable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${GITHUB_RUN_NUMBER}" "$ZIP" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Wallpaper Manager build ${GITHUB_RUN_NUMBER}" \
+            --notes "Automated build for commit ${GITHUB_SHA}."

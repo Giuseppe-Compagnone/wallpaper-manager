@@ -199,6 +199,20 @@ The resulting file is written to:
 outputs/wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
 ```
 
+## Continuous builds and releases
+
+The repository includes `.github/workflows/build-release.yml`. Every push to
+`main` (and every manual workflow dispatch) runs `make pack`, uploads the ZIP
+as a GitHub Actions artifact, and attaches the same ZIP to a numbered GitHub
+release. The release version is stamped from the Actions run number, without
+modifying the committed source metadata.
+
+Marketplace publication is kept as a separate step because it requires
+transferring an extensions.gnome.org account credential to an upload service
+and accepting the marketplace agreement. Configure that step only after
+reviewing and approving the credential-handling procedure in
+`PUBLISHING.md`.
+
 Inspect its contents before distributing it:
 
 ```bash
