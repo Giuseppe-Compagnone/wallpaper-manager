@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
-import GLib from 'gi://GLib';
 
 import {
     InjectionManager,
@@ -17,7 +15,6 @@ export class ShellBackgrounds {
         this._getWallpaper = getWallpaper;
         this._onDesktopManagerChanged = onDesktopManagerChanged;
         this._records = new Map();
-        this._pendingOwnSwaps = new Set();
     }
 
     enable() {
@@ -63,11 +60,7 @@ export class ShellBackgrounds {
             Background.BackgroundManager.prototype,
             '_swapBackgroundActor',
             original => function () {
-                const ownSwap = shellBackgrounds._pendingOwnSwaps.delete(this);
                 original.call(this);
-                if (ownSwap)
-                    return;
-
                 const record = shellBackgrounds._records.get(this);
                 if (record)
                     shellBackgrounds._applyRecord(record);
@@ -93,7 +86,6 @@ export class ShellBackgrounds {
             record.manager._updateBackgroundActor();
         }
         this._records.clear();
-        this._pendingOwnSwaps.clear();
         this._getWallpaper = null;
         this._onDesktopManagerChanged = null;
     }
@@ -114,72 +106,7 @@ export class ShellBackgrounds {
             Gio.File.new_for_path(wallpaper.path),
             wallpaper.style
         );
-
-        const oldActor = manager.backgroundActor;
-        const container = manager._container ?? oldActor.get_parent();
-        if (!container || typeof manager._swapBackgroundActor !== 'function') {
-            oldActor.content.set({background});
-            return background;
-        }
-
-        if (manager._newBackgroundActor)
-            manager._newBackgroundActor.destroy();
-
-        const newActor = new Meta.BackgroundActor({
-            meta_display: global.display,
-            monitor: manager._monitorIndex,
-            request_mode: manager._useContentSize
-                ? Clutter.RequestMode.CONTENT_SIZE
-                : Clutter.RequestMode.HEIGHT_FOR_WIDTH,
-            x_expand: !manager._useContentSize,
-            y_expand: !manager._useContentSize,
-        });
-        newActor.content.set({background});
-        newActor.visible = oldActor.visible;
-
-        const oldContent = oldActor.content;
-        const newContent = newActor.content;
-        newContent.vignette_sharpness = oldContent.vignette_sharpness;
-        newContent.brightness = oldContent.brightness;
-
-        container.add_child(newActor);
-        if (manager._controlPosition) {
-            const monitor = manager._layoutManager?.monitors?.[
-                manager._monitorIndex
-            ];
-            if (monitor)
-                newActor.set_position(monitor.x, monitor.y);
-            container.set_child_below_sibling(newActor, null);
-        }
-
-        manager._newBackgroundActor = newActor;
-        let loadedId = 0;
-        const swap = () => {
-            if (loadedId) {
-                background.disconnect(loadedId);
-                loadedId = 0;
-            }
-            if (manager._newBackgroundActor !== newActor)
-                return GLib.SOURCE_REMOVE;
-
-            this._pendingOwnSwaps.add(manager);
-            manager._swapBackgroundActor();
-            return GLib.SOURCE_REMOVE;
-        };
-
-        newActor.connect('destroy', () => {
-            if (loadedId) {
-                background.disconnect(loadedId);
-                loadedId = 0;
-            }
-        });
-
-        if (background.isLoaded) {
-            GLib.idle_add(GLib.PRIORITY_DEFAULT, swap);
-        } else {
-            loadedId = background.connect('loaded', swap);
-        }
-
+        manager.backgroundActor.content.set({background});
         return background;
     }
 

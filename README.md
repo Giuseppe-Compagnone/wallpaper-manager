@@ -17,7 +17,6 @@ background shown while switching workspaces.
 - A separate wallpaper for every monitor/workspace pair.
 - Alphabetical or shuffled image order.
 - Fair reshuffling: every image can reach every slot over time.
-- Smooth fade transition when wallpapers change.
 - Optional automatic reshuffling at a configurable interval.
 - Automatic refresh when images are added to or removed from the folder.
 - **Fill and crop** or **Fit with borders** scaling.
