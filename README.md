@@ -1,49 +1,33 @@
 # Wallpaper Manager
 
-<p align="center">
-  <img src="extension/wallpaper-manager.png"
-       alt="Wallpaper Manager icon" width="192" height="192">
-</p>
-
 Wallpaper Manager is a GNOME Shell extension that assigns a different local
-image to every physical monitor and workspace.
+wallpaper to every physical monitor and workspace. It uses the images in the
+selected folder before repeating any image.
 
-It treats each monitor/workspace pair as an independent wallpaper slot and
-uses every image in the selected folder before repeating the list. The correct
-wallpaper is visible on the desktop, in the Activities overview, and during
-workspace-switch animations.
-
-Wallpaper Manager works entirely offline. It does not bundle wallpapers,
-connect to remote services, collect analytics, or share user data.
+The extension also updates the desktop, the Activities overview, and the
+background shown while switching workspaces.
 
 ## Features
 
-- A different wallpaper for every monitor and workspace.
-- Correct backgrounds in the Activities overview and workspace animations.
-- Alphabetical or stable shuffled ordering.
+- A separate wallpaper for every monitor/workspace pair.
+- Alphabetical or shuffled image order.
+- Fair reshuffling: every image can reach every slot over time.
+- Optional automatic reshuffling at a configurable interval.
 - Automatic refresh when images are added to or removed from the folder.
-- **Fill and crop** and **Fit with borders** scaling modes.
-- Images repeat only after every available image has been assigned.
-- No network access, telemetry, subprocesses, or bundled artwork.
-- Native GNOME preferences built with GTK 4 and Libadwaita.
-- Preferences and notifications translated according to the system language.
+- **Fill and crop** or **Fit with borders** scaling.
+- Italian, German, French, Spanish, Brazilian Portuguese, Russian, Simplified
+  Chinese, and Japanese translations, selected from the GNOME system language.
+- Works entirely offline and does not include or upload your wallpapers.
 
-## Compatibility
+## Requirements
 
-| Component | Supported version |
-| --- | --- |
-| GNOME Shell | 46 |
-| Ubuntu | 24.04 LTS |
-| Display server | Wayland, with the same code path available on X11 |
-
-Only GNOME Shell versions listed in `extension/metadata.json` are claimed as
-supported. Additional versions should be added only after testing their Shell
-internals, overview, and workspace animation APIs.
+- GNOME Shell 46 (Ubuntu 24.04 LTS).
+- Wayland or X11.
+- A folder containing supported image files.
 
 ## Supported image formats
 
-Wallpaper Manager reads regular files located directly inside the selected
-folder with one of these extensions:
+Wallpaper Manager reads image files directly inside the selected folder:
 
 - BMP
 - GIF
@@ -54,10 +38,54 @@ folder with one of these extensions:
 
 Subdirectories are not scanned.
 
-## How assignment works
+## Installation
 
-Images are sorted alphabetically by full path unless shuffling is enabled.
-The extension then assigns them in this order:
+### GNOME Extensions
+
+Open the [Wallpaper Manager page on GNOME Extensions](https://extensions.gnome.org/extension/11140/wallpaper-manager/)
+and install the version available for your GNOME release.
+
+### GitHub release or Actions artifact
+
+You can also download the latest ZIP from the
+[latest GitHub release](https://github.com/Giuseppe-Compagnone/wallpaper-manager/releases/latest).
+
+To install an artifact from a specific build:
+
+1. Open the [Build and release workflow](https://github.com/Giuseppe-Compagnone/wallpaper-manager/actions/workflows/build-release.yml).
+2. Open a successful run and download `wallpaper-manager-<commit>`.
+3. Extract the downloaded archive and install the extension ZIP inside it:
+
+```bash
+gnome-extensions install --force \
+  wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
+```
+
+After installation, open the GNOME **Extensions** application and enable
+**Wallpaper Manager**. If GNOME does not show the extension immediately on
+Wayland, log out and back in; your open applications do not need to be closed.
+
+## Configuration
+
+Open the GNOME **Extensions** application, find **Wallpaper Manager**, and
+open its preferences.
+
+| Setting | Description |
+| --- | --- |
+| Image folder | Folder containing the wallpapers. |
+| Shuffle images | Uses a stable shuffled order instead of alphabetical order. |
+| Reshuffle now | Immediately creates a new assignment. |
+| Automatic shuffle | Periodically creates a new assignment. It requires Shuffle images. |
+| Automatic shuffle interval | Minutes between automatic reshuffles, from 1 to 1440. The default is 60 minutes. |
+| Wallpaper scaling | Choose Fill and crop or Fit with borders. |
+
+Changes are applied automatically. The folder is monitored while the
+extension is enabled, so adding or removing an image does not require a
+restart.
+
+## How wallpapers are assigned
+
+Images are assigned by workspace and monitor:
 
 1. workspace 1, monitor 1;
 2. workspace 1, monitor 2;
@@ -65,281 +93,38 @@ The extension then assigns them in this order:
 4. workspace 2, monitor 2;
 5. and so on.
 
-Internally, the slot is calculated as:
+If there are more slots than images, the list repeats only after all images
+have been used. With shuffle enabled, reshuffling changes the stable order and
+the cycle is balanced so that images are not permanently excluded from the
+first workspace or any other slot.
 
-```text
-slot = workspaceIndex * monitorCount + monitorIndex
-image = images[slot modulo imageCount]
-```
+## Privacy
 
-For example, with two monitors and five images:
-
-| Workspace | Monitor 1 | Monitor 2 |
-| --- | --- | --- |
-| 1 | Image A | Image B |
-| 2 | Image C | Image D |
-| 3 | Image E | Image A |
-
-The shuffled order is deterministic for a given seed. Pressing **Reshuffle**
-increments the seed, samples a new visible group from the folder, and creates
-a new stable assignment. The shuffle advances through a fair cycle: every
-image reaches every workspace/monitor slot once before that cycle repeats.
-This also guarantees that an image left out because there are fewer slots than
-images is selected on a later reshuffle.
-
-## Installation
-
-### Install from GNOME Extensions
-
-Open the Wallpaper Manager page on
-[GNOME Extensions](https://extensions.gnome.org/extension/11140/wallpaper-manager/)
-to install the marketplace version when it is available for your GNOME release.
-
-### Install from a GitHub Actions artifact
-
-Each push to `main` creates a downloadable artifact:
-
-1. Open the [Build and release workflow](https://github.com/Giuseppe-Compagnone/wallpaper-manager/actions/workflows/build-release.yml).
-2. Open the run you want and download its artifact named
-   `wallpaper-manager-<commit>`.
-3. Extract the downloaded artifact ZIP. It contains the extension ZIP.
-4. Install that inner ZIP for the current user:
-
-```bash
-gnome-extensions install --force \
-  wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
-```
-
-The latest successful build is also attached to the
-[latest GitHub release](https://github.com/Giuseppe-Compagnone/wallpaper-manager/releases/latest).
-
-### Install a release ZIP
-
-Download the release archive and run:
-
-```bash
-gnome-extensions install --force \
-  wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
-```
-
-On Wayland, log out and back in after installing a new extension. Then open
-the GNOME **Extensions** application and enable **Wallpaper Manager**.
-
-### Install from source
-
-Required build tools:
-
-- `gnome-extensions`
-- `glib-compile-schemas`
-- Node.js 18 or newer, used only for tests
-- GNU Make
-- Python Babel, only when rebuilding translation catalogs
-
-Build and install the extension:
-
-```bash
-make check
-make install
-```
-
-The install target creates the extension ZIP and installs it for the current
-user. Log out and back in on Wayland before enabling it.
-
-To rebuild `.mo` files after editing a `.po` file, install the Python Babel
-package provided by your distribution and run `make translations`.
-
-## Configuration
-
-Open the Extensions application, find **Wallpaper Manager**, and select its
-preferences button.
-
-Available settings:
-
-| Setting | Description |
-| --- | --- |
-| Image folder | Local folder containing the wallpapers. |
-| Shuffle images | Uses a stable pseudo-random order instead of alphabetical order. |
-| Reshuffle now | Generates a new shuffled assignment. |
-| Automatic shuffle | Periodically generates a new shuffled assignment. It requires Shuffle images. |
-| Automatic shuffle interval | Number of minutes between automatic reshuffles. |
-| Wallpaper scaling | Fills and crops the image, or fits it with borders. |
-
-Changes are applied automatically. The folder is monitored while the extension
-is active, so adding or removing an image does not require restarting GNOME
-Shell.
-
-## Localization
-
-Wallpaper Manager follows the language configured for the GNOME session. No
-language selector is needed: gettext automatically selects the closest
-available catalog and falls back to English when a translation is unavailable.
-
-The release currently includes Italian, German, French, Spanish, Brazilian
-Portuguese, Russian, Simplified Chinese, and Japanese catalogs. English is the
-source-language fallback.
-
-## Architecture
-
-The extension deliberately avoids generating large composite images. Each
-GNOME background actor receives the file assigned to its own monitor and
-workspace.
-
-| File | Responsibility |
-| --- | --- |
-| `extension/extension.js` | Minimal GNOME lifecycle entry point. |
-| `extension/wallpaperController.js` | Settings, folder monitoring, assignment, and desktop updates. |
-| `extension/shellBackgrounds.js` | Overview and workspace-animation integration. |
-| `extension/fileScanner.js` | Asynchronous folder enumeration and image filtering. |
-| `extension/assignment.js` | Pure ordering and slot-assignment functions. |
-| `extension/prefs.js` | GTK 4/Libadwaita preferences window. |
-| `extension/wallpaper-manager.png` | Preferences and marketplace icon. |
-| `extension/schemas/` | GSettings schema. |
-| `extension/locale/` | Compiled gettext catalogs loaded by GNOME. |
-| `po/` | Source translations and the gettext template. |
-
-Folder enumeration is asynchronous to avoid blocking GNOME Shell. Method
-overrides are managed with GNOME's `InjectionManager` and are fully restored
-when the extension is disabled.
-
-## Development
-
-Run all checks:
-
-```bash
-make check
-```
-
-This validates the GSettings schema, checks JavaScript syntax, and runs the
-assignment tests.
-
-Build the distributable archive:
-
-```bash
-make clean
-make pack
-```
-
-The resulting file is written to:
-
-```text
-outputs/wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
-```
-
-## Continuous builds and releases
-
-The repository includes `.github/workflows/build-release.yml`. Every push to
-`main` (and every manual workflow dispatch) runs `make pack`, uploads the ZIP
-as a GitHub Actions artifact, and attaches the same ZIP to a numbered GitHub
-release. The release version is stamped from the Actions run number, without
-modifying the committed source metadata.
-
-The workflow also publishes to extensions.gnome.org when the repository has
-both `GNOME_EXTENSIONS_USERNAME` and `GNOME_EXTENSIONS_PASSWORD` Actions
-secrets. If either secret is missing, the marketplace job is skipped while the
-build and GitHub release still succeed. The upload accepts the GNOME Extensions
-Developer Agreement on behalf of the configured account.
-
-Inspect its contents before distributing it:
-
-```bash
-unzip -l outputs/*.shell-extension.zip
-unzip -t outputs/*.shell-extension.zip
-```
-
-### Testing inside GNOME Shell
-
-After changing extension code, GNOME Shell must load a fresh module instance.
-On Wayland, log out and back in. A nested test session can also be started on
-GNOME 48 and earlier with:
-
-```bash
-dbus-run-session gnome-shell --nested --wayland
-```
-
-Useful logs from the main session can be inspected with:
-
-```bash
-journalctl --user -f -o cat | grep -i 'wallpaper manager'
-```
-
-Test at least these scenarios before a release:
-
-- one and multiple physical monitors;
-- more workspaces than wallpapers;
-- more wallpapers than workspace/monitor slots;
-- Activities overview previews;
-- keyboard and touchpad workspace animations;
-- dynamic workspace creation and removal;
-- adding and deleting files in the selected folder;
-- changing scaling and shuffle settings;
-- disable/enable and logout/login cycles;
-- opening and closing the preferences window repeatedly.
-
-## Repository layout
-
-```text
-wallpaper-manager/
-├── extension/          Runtime extension and GSettings schema
-├── po/                 Gettext source catalogs
-├── tools/              Translation build helper
-├── tests/              Pure JavaScript tests
-├── Makefile            Check, package, and install targets
-├── MARKETPLACE.md      Suggested GNOME Extensions listing text
-├── PUBLISHING.md       Pre-release and EGO upload checklist
-├── CONTRIBUTING.md     Contribution and testing guidelines
-└── README.md
-```
-
-Generated archives, local work files, and wallpapers are ignored by Git and
-must not be committed.
-
-## Icon
-
-The canonical icon is
-[`extension/wallpaper-manager.png`](extension/wallpaper-manager.png).
-It is an original 512 × 512 RGBA image with a transparent background. The
-preferences window loads it from the extension's private icon search path, and
-the same file can be uploaded as the extension icon on extensions.gnome.org.
-
-## Privacy and permissions
-
-Wallpaper Manager only accesses the local folder explicitly selected by the
-user. It does not:
+Wallpaper Manager only reads the folder selected in its preferences. It does
+not:
 
 - connect to the internet;
 - execute external programs;
-- use telemetry or analytics;
-- read unrelated user files;
-- include or redistribute the user's wallpapers.
-
-## Known limitations
-
-- Only files directly inside the selected folder are scanned.
-- One scaling mode applies to every monitor.
-- GNOME Shell 46 is currently the only declared compatible release.
-- Workspace assignments follow workspace indices; reordering workspaces also
-  changes which image belongs to each position.
+- collect telemetry or analytics;
+- read unrelated files; or
+- include or redistribute your wallpapers.
 
 ## Troubleshooting
 
-### The extension does not appear after installation
+### The extension does not appear
 
-Log out and back in, especially on Wayland. Confirm that the extension folder
-name matches its UUID:
+Open the GNOME **Extensions** application and check that **Wallpaper Manager**
+is enabled. On Wayland, log out and back in after installing or updating it.
 
-```text
-~/.local/share/gnome-shell/extensions/
-wallpaper-manager@giuseppe-compagnone.github.io/
-```
+### Wallpapers do not change
 
-### No wallpaper changes
-
-Open preferences and confirm that the selected folder exists and contains a
-supported image format. The files must be directly inside the folder.
+Check that the selected folder still exists, contains supported image files,
+and that the files are directly inside the folder rather than in a
+subdirectory.
 
 ### Preferences do not open
 
-Run the preferences command from a terminal and inspect its output:
+Run this command to open the preferences and show any error:
 
 ```bash
 gnome-extensions prefs wallpaper-manager@giuseppe-compagnone.github.io
@@ -347,23 +132,11 @@ gnome-extensions prefs wallpaper-manager@giuseppe-compagnone.github.io
 
 ### The wrong image appears on a monitor
 
-Check GNOME's monitor order in **Settings → Displays**. Assignment uses the
-monitor indices provided by GNOME Shell, not the physical left-to-right order.
-
-## Publishing
-
-See [`PUBLISHING.md`](PUBLISHING.md) for the release checklist and
-[`MARKETPLACE.md`](MARKETPLACE.md) for the proposed store description.
-
-GNOME extension submissions must follow the official
-[review guidelines](https://gjs.guide/extensions/review-guidelines/review-guidelines.html).
-
-## Contributing
-
-Bug reports and contributions are welcome. Please read
-[`CONTRIBUTING.md`](CONTRIBUTING.md) before submitting changes.
+Check the monitor order in **Settings → Displays**. Assignments follow the
+monitor order reported by GNOME, not necessarily the physical left-to-right
+order.
 
 ## License
 
-Wallpaper Manager is licensed under the GNU General Public License,
-version 3 or later. See [`LICENSE`](LICENSE).
+Wallpaper Manager is licensed under the
+[GNU General Public License version 3 or later](LICENSE).
