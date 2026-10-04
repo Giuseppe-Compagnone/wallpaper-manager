@@ -91,8 +91,9 @@ images is selected on a later reshuffle.
 
 ### Install from GNOME Extensions
 
-Install the reviewed marketplace version directly from
-[GNOME Extensions](https://extensions.gnome.org/extension/11140/wallpaper-manager/).
+Open the Wallpaper Manager page on
+[GNOME Extensions](https://extensions.gnome.org/extension/11140/wallpaper-manager/)
+to install the marketplace version when it is available for your GNOME release.
 
 ### Install from a GitHub Actions artifact
 
