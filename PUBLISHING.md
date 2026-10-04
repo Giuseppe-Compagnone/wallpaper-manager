@@ -30,6 +30,9 @@ The UUID is intentionally tied to the configured GitHub account:
 `wallpaper-manager@giuseppe-compagnone.github.io`. It must not be changed after
 the first public upload.
 
+The public marketplace page is:
+<https://extensions.gnome.org/extension/11140/wallpaper-manager/>.
+
 ## GitHub Actions builds
 
 `.github/workflows/build-release.yml` runs on every push to `main` and on

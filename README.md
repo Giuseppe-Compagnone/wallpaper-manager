@@ -89,6 +89,29 @@ images is selected on a later reshuffle.
 
 ## Installation
 
+### Install from GNOME Extensions
+
+Install the reviewed marketplace version directly from
+[GNOME Extensions](https://extensions.gnome.org/extension/11140/wallpaper-manager/).
+
+### Install from a GitHub Actions artifact
+
+Each push to `main` creates a downloadable artifact:
+
+1. Open the [Build and release workflow](https://github.com/Giuseppe-Compagnone/wallpaper-manager/actions/workflows/build-release.yml).
+2. Open the run you want and download its artifact named
+   `wallpaper-manager-<commit>`.
+3. Extract the downloaded artifact ZIP. It contains the extension ZIP.
+4. Install that inner ZIP for the current user:
+
+```bash
+gnome-extensions install --force \
+  wallpaper-manager@giuseppe-compagnone.github.io.shell-extension.zip
+```
+
+The latest successful build is also attached to the
+[latest GitHub release](https://github.com/Giuseppe-Compagnone/wallpaper-manager/releases/latest).
+
 ### Install a release ZIP
 
 Download the release archive and run:
