@@ -1,5 +1,10 @@
 # Wallpaper Manager
 
+<p align="center">
+  <img src="extension/wallpaper-manager.png"
+       alt="Wallpaper Manager icon" width="192" height="192">
+</p>
+
 Wallpaper Manager is a GNOME Shell extension that assigns a different local
 wallpaper to every physical monitor and workspace. It uses the images in the
 selected folder before repeating any image.
