@@ -105,6 +105,51 @@ export default class WallpaperManagerPreferences extends ExtensionPreferences {
         reshuffleRow.add_suffix(reshuffleButton);
         sourceGroup.add(reshuffleRow);
 
+        const autoShuffleRow = new Adw.SwitchRow({
+            title: _('Automatic shuffle'),
+            subtitle: _(
+                'Periodically create a new assignment using the folder images.'
+            ),
+        });
+        settings.bind(
+            'auto-shuffle',
+            autoShuffleRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+        sourceGroup.add(autoShuffleRow);
+
+        const intervalAdjustment = new Gtk.Adjustment({
+            lower: 1,
+            upper: 1440,
+            step_increment: 1,
+            page_increment: 10,
+            value: settings.get_uint('auto-shuffle-interval'),
+        });
+        const intervalRow = new Adw.SpinRow({
+            title: _('Automatic shuffle interval'),
+            subtitle: _('Minutes between automatic reshuffles.'),
+            adjustment: intervalAdjustment,
+            numeric: true,
+        });
+        settings.bind(
+            'auto-shuffle-interval',
+            intervalRow,
+            'value',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+        sourceGroup.add(intervalRow);
+
+        const updateAutoShuffleControls = () => {
+            const shuffleEnabled = settings.get_boolean('shuffle');
+            autoShuffleRow.sensitive = shuffleEnabled;
+            intervalRow.sensitive = shuffleEnabled
+                && settings.get_boolean('auto-shuffle');
+        };
+        signalIds.push(settings.connect('changed::shuffle', updateAutoShuffleControls));
+        signalIds.push(settings.connect('changed::auto-shuffle', updateAutoShuffleControls));
+        updateAutoShuffleControls();
+
         const appearanceGroup = new Adw.PreferencesGroup({
             title: _('Appearance'),
         });

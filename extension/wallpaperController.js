@@ -20,6 +20,7 @@ export class WallpaperController {
         this._desktopBackgrounds = new Map();
         this._scanGeneration = 0;
         this._reloadSourceId = 0;
+        this._autoShuffleSourceId = 0;
         this._warnedEmpty = false;
     }
 
@@ -33,8 +34,13 @@ export class WallpaperController {
 
         this._settings.connectObject(
             'changed::wallpaper-folder', () => this._scheduleReload(),
-            'changed::shuffle', () => this._scheduleReload(),
+            'changed::shuffle', () => {
+                this._scheduleReload();
+                this._updateAutoShuffleTimer();
+            },
             'changed::shuffle-seed', () => this._scheduleReload(),
+            'changed::auto-shuffle', () => this._updateAutoShuffleTimer(),
+            'changed::auto-shuffle-interval', () => this._updateAutoShuffleTimer(),
             'changed::fit-mode', () => this._refreshBackgrounds(),
             this
         );
@@ -48,6 +54,7 @@ export class WallpaperController {
             this
         );
 
+        this._updateAutoShuffleTimer();
         this._reloadImages();
     }
 
@@ -56,6 +63,7 @@ export class WallpaperController {
             GLib.source_remove(this._reloadSourceId);
             this._reloadSourceId = 0;
         }
+        this._clearAutoShuffleTimer();
         this._scanCancellable?.cancel();
         this._scanCancellable = null;
 
@@ -87,6 +95,45 @@ export class WallpaperController {
                 this._reloadSourceId = 0;
                 this._reloadImages();
                 return GLib.SOURCE_REMOVE;
+            }
+        );
+    }
+
+    _clearAutoShuffleTimer() {
+        if (!this._autoShuffleSourceId)
+            return;
+
+        GLib.source_remove(this._autoShuffleSourceId);
+        this._autoShuffleSourceId = 0;
+    }
+
+    _updateAutoShuffleTimer() {
+        this._clearAutoShuffleTimer();
+
+        if (!this._settings?.get_boolean('auto-shuffle')
+            || !this._settings.get_boolean('shuffle'))
+            return;
+
+        const intervalMinutes = Math.max(
+            1,
+            this._settings.get_uint('auto-shuffle-interval')
+        );
+        this._autoShuffleSourceId = GLib.timeout_add_seconds(
+            GLib.PRIORITY_DEFAULT,
+            intervalMinutes * 60,
+            () => {
+                if (!this._settings?.get_boolean('auto-shuffle')
+                    || !this._settings.get_boolean('shuffle')) {
+                    this._autoShuffleSourceId = 0;
+                    return GLib.SOURCE_REMOVE;
+                }
+
+                const seed = this._settings.get_uint('shuffle-seed');
+                this._settings.set_uint(
+                    'shuffle-seed',
+                    seed === 0xffffffff ? 1 : seed + 1
+                );
+                return GLib.SOURCE_CONTINUE;
             }
         );
     }

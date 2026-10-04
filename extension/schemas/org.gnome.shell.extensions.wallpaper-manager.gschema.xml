@@ -19,6 +19,17 @@
       <default>false</default>
       <summary>Shuffle images</summary>
     </key>
+    <key name="auto-shuffle" type="b">
+      <default>false</default>
+      <summary>Automatically reshuffle images</summary>
+      <description>Periodically create a new shuffled assignment while shuffle is enabled.</description>
+    </key>
+    <key name="auto-shuffle-interval" type="u">
+      <range min="1" max="1440"/>
+      <default>60</default>
+      <summary>Automatic shuffle interval in minutes</summary>
+      <description>Number of minutes between automatic reshuffles.</description>
+    </key>
     <key name="shuffle-seed" type="u">
       <default>1</default>
       <summary>Stable random order seed</summary>

@@ -160,6 +160,8 @@ Available settings:
 | Image folder | Local folder containing the wallpapers. |
 | Shuffle images | Uses a stable pseudo-random order instead of alphabetical order. |
 | Reshuffle now | Generates a new shuffled assignment. |
+| Automatic shuffle | Periodically generates a new shuffled assignment. It requires Shuffle images. |
+| Automatic shuffle interval | Number of minutes between automatic reshuffles. |
 | Wallpaper scaling | Fills and crops the image, or fits it with borders. |
 
 Changes are applied automatically. The folder is monitored while the extension
